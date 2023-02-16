@@ -1,0 +1,10 @@
+version: '3'
+services:
+  mongo:
+    image : candis/mongo-replica-set
+    container_name: mongo
+    hostname: mongo
+    ports:
+      - 27017:27017
+      - 27018:27018
+      - 27019:27019
