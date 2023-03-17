@@ -1,7 +1,8 @@
 version: '3'
 services:
   mongo:
-    image : candis/mongo-replica-set
+    build: .
+    image: mongors
     container_name: mongo
     hostname: mongo
     ports:
