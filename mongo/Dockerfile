@@ -10,8 +10,8 @@ ARG MONGOSH_URL=https://downloads.mongodb.com/compass/${MONGOSH}.tgz
 RUN apt-get update && \
     apt-get upgrade -y
 
-# install curl & openSSL
-RUN apt-get install -y curl openssl
+# install all that good stuff
+RUN apt-get install -y curl openssl netcat
 
 # downloads mongo & mongosh
 RUN curl -OL ${MONGO_URL} && \
