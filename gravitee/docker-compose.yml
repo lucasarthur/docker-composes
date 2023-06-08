@@ -9,14 +9,14 @@ networks:
 services:
   mongodb:
     image: mongo:3.6
-    container_name: gio_apim_mongodb
+    container_name: gio_mongo
     restart: always
     networks:
       - storage
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
-    container_name: gio_apim_elasticsearch
+    container_name: gio_elastic
     restart: always
     environment:
       - http.host=0.0.0.0
@@ -36,8 +36,8 @@ services:
       - storage
 
   gateway:
-    image: graviteeio/apim-gateway:3
-    container_name: gio_apim_gateway
+    image: graviteeio/apim-gateway
+    container_name: gio_apigw
     restart: always
     ports:
       - 8082:8082
@@ -53,8 +53,8 @@ services:
       - frontend
 
   management_api:
-    image: graviteeio/apim-management-api:3
-    container_name: gio_apim_management_api
+    image: graviteeio/apim-management-api
+    container_name: gio_mgmt_api
     restart: always
     ports:
       - 8083:8083
@@ -72,8 +72,8 @@ services:
       - frontend
 
   management_ui:
-    image: graviteeio/apim-management-ui:3
-    container_name: gio_apim_management_ui
+    image: graviteeio/apim-management-ui
+    container_name: gio_mgmt_ui
     restart: always
     ports:
       - 8084:8080
@@ -81,18 +81,5 @@ services:
       - management_api
     environment:
       - MGMT_API_URL=http://localhost:8083/management/organizations/DEFAULT/environments/DEFAULT/
-    networks:
-      - frontend
-
-  portal_ui:
-    image: graviteeio/apim-portal-ui:3
-    container_name: gio_apim_portal_ui
-    restart: always
-    ports:
-      - 8085:8080
-    depends_on:
-      - management_api
-    environment:
-      - PORTAL_API_URL=http://localhost:8083/portal/environments/DEFAULT
     networks:
       - frontend
