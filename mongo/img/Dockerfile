@@ -1,6 +1,5 @@
 # syntax=docker/dockerfile:1
 FROM --platform=$TARGETPLATFORM ubuntu:22.04 AS builder
-
 ARG TARGETPLATFORM
 
 RUN apt-get update \
@@ -27,7 +26,7 @@ RUN apt-get update \
 FROM ubuntu:22.04
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends curl netcat \
+  && apt-get install -y --no-install-recommends curl wait-for-it \
   && rm -rf /var/lib/apt/lists/* \
   && groupadd -r mongo && useradd -r -g mongo -d /home/mongo -m mongo
 
