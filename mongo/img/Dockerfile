@@ -1,14 +1,26 @@
-FROM --platform=linux/arm64/v8 ubuntu:22.04 AS builder
+# syntax=docker/dockerfile:1
+FROM --platform=$TARGETPLATFORM ubuntu:22.04 AS builder
+
+ARG TARGETPLATFORM
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates curl \
-  && curl https://fastdl.mongodb.org/linux/mongodb-linux-aarch64-ubuntu2204-6.0.6.tgz -o mongodb.tgz \
-  && curl https://downloads.mongodb.com/compass/mongosh-1.9.1-linux-arm64.tgz -o mongosh.tgz \
+  && case "$TARGETPLATFORM" in \
+    "linux/amd64") \
+      curl https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2204-6.0.6.tgz -o mongodb.tgz \
+      && curl https://downloads.mongodb.com/compass/mongosh-1.9.1-linux-x64.tgz -o mongosh.tgz \
+      ;; \
+    "linux/arm64/v8") \
+      curl https://fastdl.mongodb.org/linux/mongodb-linux-aarch64-ubuntu2204-6.0.6.tgz -o mongodb.tgz \
+      && curl https://downloads.mongodb.com/compass/mongosh-1.9.1-linux-arm64.tgz -o mongosh.tgz \
+      ;; \
+    *) echo "Unsupported platform: $TARGETPLATFORM" && exit 1 ;; \
+  esac \
   && tar -xzf mongodb.tgz \
   && tar -xzf mongosh.tgz \
   && rm -rf mongodb.tgz mongosh.tgz \
-  && mv mongodb-linux-aarch64-ubuntu2204-6.0.6/bin/mongod mongosh-1.9.1-linux-arm64/bin/mongosh /usr/local/bin/ \
-  && rm -rf mongodb-linux-aarch64-ubuntu2204-6.0.6 mongosh-1.9.1-linux-arm64 \
+  && mv mongodb-*/bin/mongod mongosh-*/bin/mongosh /usr/local/bin/ \
+  && rm -rf mongodb-* mongosh-* \
   && apt-get purge -y --auto-remove ca-certificates curl \
   && rm -rf /var/lib/apt/lists/*
 
