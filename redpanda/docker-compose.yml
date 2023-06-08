@@ -2,6 +2,7 @@ version: '3'
 services:
   redpanda:
     image: redpandadata/redpanda
+    hostname: redpanda
     container_name: redpanda
     ports:
       - 9092:9092
