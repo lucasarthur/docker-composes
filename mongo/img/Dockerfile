@@ -10,7 +10,7 @@ RUN apt-get update \
       curl https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2204-6.0.6.tgz -o mongodb.tgz \
       && curl https://downloads.mongodb.com/compass/mongosh-1.9.1-linux-x64.tgz -o mongosh.tgz \
       ;; \
-    "linux/arm64/v8") \
+    "linux/arm64") \
       curl https://fastdl.mongodb.org/linux/mongodb-linux-aarch64-ubuntu2204-6.0.6.tgz -o mongodb.tgz \
       && curl https://downloads.mongodb.com/compass/mongosh-1.9.1-linux-arm64.tgz -o mongosh.tgz \
       ;; \
