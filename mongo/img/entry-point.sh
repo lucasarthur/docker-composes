@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
-/bin/bash ./init-replica.sh &
-/bin/bash ./init-dbs.sh
+/bin/bash /usr/local/bin/init-replica.sh &
+/bin/bash /usr/local/bin/init-dbs.sh

@@ -1,55 +1,34 @@
-FROM ubuntu:22.04 as base
+FROM debian:bullseye-slim AS builder
 
-ARG MONGO=mongodb-linux-x86_64-ubuntu2204-6.0.5
-ARG MONGOSH=mongosh-1.8.0-linux-x64-openssl3
-ARG MONGO_URL=https://fastdl.mongodb.org/linux/${MONGO}.tgz
-ARG MONGOSH_URL=https://downloads.mongodb.com/compass/${MONGOSH}.tgz
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates curl \
+  && curl https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-debian11-6.0.6.tgz -o mongodb.tgz \
+  && curl https://downloads.mongodb.com/compass/mongosh-1.9.1-linux-x64.tgz -o mongosh.tgz \
+  && tar -xzf mongodb.tgz \
+  && tar -xzf mongosh.tgz \
+  && rm -rf mongodb.tgz mongosh.tgz \
+  && mv mongodb-linux-x86_64-debian11-6.0.6/bin/mongod mongosh-1.9.1-linux-x64/bin/mongosh /usr/local/bin/ \
+  && rm -rf mongodb-linux-x86_64-debian11-6.0.6 mongosh-1.9.1-linux-x64 \
+  && apt-get purge -y --auto-remove ca-certificates curl \
+  && rm -rf /var/lib/apt/lists/*
 
-# update & upgrade
-RUN apt-get update && apt-get upgrade -y
+FROM debian:bullseye-slim
 
-# install all that good stuff
-RUN apt-get install -y curl openssl netcat
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends curl openssl netcat \
+  && rm -rf /var/lib/apt/lists/* \
+  && groupadd -r mongo && useradd -r -g mongo -d /home/mongo -m mongo
 
-# download mongo & mongosh
-RUN curl -OL {$MONGO_URL,$MONGOSH_URL}
+COPY --from=builder /usr/local/bin/mongod /usr/local/bin/mongosh /usr/local/bin/
+COPY init-dbs.sh init-replica.sh entry-point.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/init-dbs.sh /usr/local/bin/init-replica.sh /usr/local/bin/entry-point.sh
 
-# extract them
-RUN tar -zxvf ${MONGO}.tgz && tar -zxvf ${MONGOSH}.tgz
+RUN mkdir -p /var/lib/mongo1 /var/log/mongo1 /var/lib/mongo2 /var/log/mongo2 /var/lib/mongo3 /var/log/mongo3 \
+  && chown -R mongo:mongo /var/lib/mongo1 /var/log/mongo1 /var/lib/mongo2 /var/log/mongo2 /var/lib/mongo3 /var/log/mongo3
 
-# move binaries
-RUN mv ./${MONGO}/bin/* ./${MONGOSH}/bin/* /usr/local/bin/
+EXPOSE 27017
+EXPOSE 27018
+EXPOSE 27019
 
-# remove all the useless stuff
-RUN rm -rf ./mongo*
-
-# copy script files
-COPY ./init-dbs.sh ./init-replica.sh ./entry-point.sh /
-
-# and give 'em some power
-RUN chmod +x /*.sh
-
-# data directories
-ARG DB1_DATA_DIR=/var/lib/mongo1
-ARG DB2_DATA_DIR=/var/lib/mongo2
-ARG DB3_DATA_DIR=/var/lib/mongo3
-
-# log directories
-ARG DB1_LOG_DIR=/var/log/mongodb1
-ARG DB2_LOG_DIR=/var/log/mongodb2
-ARG DB3_LOG_DIR=/var/log/mongodb3
-
-# db ports
-ARG DB1_PORT=27017
-ARG DB1_PORT=27018
-ARG DB1_PORT=27019
-
-# dirs and permissions, all that bla, bla, bla
-RUN mkdir -p ${DB1_DATA_DIR} ${DB1_LOG_DIR} ${DB2_DATA_DIR} ${DB2_LOG_DIR} ${DB3_DATA_DIR} ${DB3_LOG_DIR}
-RUN chown `whoami` ${DB1_DATA_DIR} ${DB1_LOG_DIR} ${DB2_DATA_DIR} ${DB2_LOG_DIR} ${DB3_DATA_DIR} ${DB3_LOG_DIR}
-
-EXPOSE ${DB1_PORT}
-EXPOSE ${DB2_PORT}
-EXPOSE ${DB3_PORT}
-
-ENTRYPOINT [ "bash", "entry-point.sh" ]
+USER mongo
+ENTRYPOINT [ "bash", "/usr/local/bin/entry-point.sh" ]
