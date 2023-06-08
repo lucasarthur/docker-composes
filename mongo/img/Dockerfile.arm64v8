@@ -1,21 +1,21 @@
-FROM debian:bullseye-slim AS builder
+FROM --platform=linux/arm64/v8 ubuntu:22.04 AS builder
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates curl \
-  && curl https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-debian11-6.0.6.tgz -o mongodb.tgz \
-  && curl https://downloads.mongodb.com/compass/mongosh-1.9.1-linux-x64.tgz -o mongosh.tgz \
+  && curl https://fastdl.mongodb.org/linux/mongodb-linux-aarch64-ubuntu2204-6.0.6.tgz -o mongodb.tgz \
+  && curl https://downloads.mongodb.com/compass/mongosh-1.9.1-linux-arm64.tgz -o mongosh.tgz \
   && tar -xzf mongodb.tgz \
   && tar -xzf mongosh.tgz \
   && rm -rf mongodb.tgz mongosh.tgz \
-  && mv mongodb-linux-x86_64-debian11-6.0.6/bin/mongod mongosh-1.9.1-linux-x64/bin/mongosh /usr/local/bin/ \
-  && rm -rf mongodb-linux-x86_64-debian11-6.0.6 mongosh-1.9.1-linux-x64 \
+  && mv mongodb-linux-aarch64-ubuntu2204-6.0.6/bin/mongod mongosh-1.9.1-linux-arm64/bin/mongosh /usr/local/bin/ \
+  && rm -rf mongodb-linux-aarch64-ubuntu2204-6.0.6 mongosh-1.9.1-linux-arm64 \
   && apt-get purge -y --auto-remove ca-certificates curl \
   && rm -rf /var/lib/apt/lists/*
 
-FROM debian:bullseye-slim
+FROM ubuntu:22.04
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends curl openssl netcat \
+  && apt-get install -y --no-install-recommends curl netcat \
   && rm -rf /var/lib/apt/lists/* \
   && groupadd -r mongo && useradd -r -g mongo -d /home/mongo -m mongo
 

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 LOCAL_HOST="${HOST:-localhost}"
 REPLICA_SET="${REPLICA_SET_NAME:-rs0}"
