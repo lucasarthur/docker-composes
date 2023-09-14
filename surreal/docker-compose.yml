@@ -13,5 +13,6 @@ services:
       - trace
       - --auth
       - memory
+      - --allow-all
     ports:
       - 8000:8000
