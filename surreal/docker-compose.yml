@@ -9,10 +9,14 @@ services:
     entrypoint:
       - /surreal
       - start
-      - --log
+      - -l
       - trace
       - --auth
+      - -u
+      - root
+      - -p
+      - root
       - memory
-      - --allow-all
+      - -A
     ports:
       - 8000:8000
