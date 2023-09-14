@@ -4,5 +4,6 @@ services:
     image: redpandadata/redpanda
     hostname: redpanda
     container_name: redpanda
+    restart: always
     ports:
       - 9092:9092
