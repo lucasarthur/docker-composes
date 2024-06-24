@@ -6,6 +6,6 @@ services:
     ports:
       - "9200:9200"
     environment:
-    - xpack.security.enabled=false
-    - "discovery.type=single-node"
-    - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      xpack.security.enabled: "false"
+      discovery.type: single-node
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
