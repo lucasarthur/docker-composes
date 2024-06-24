@@ -1,22 +1,16 @@
-version: '3'
-
 services:
   surreal:
     image: surrealdb/surrealdb
     container_name: surreal
     hostname: surreal
     restart: always
-    entrypoint:
-      - /surreal
+    command:
       - start
-      - -l
-      - trace
+      - --log=trace
       - --auth
-      - -u
-      - root
-      - -p
-      - root
+      - --user=root
+      - --pass=root
       - memory
       - -A
     ports:
-      - 8000:8000
+      - "8000:8000"
