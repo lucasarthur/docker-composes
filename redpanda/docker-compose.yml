@@ -6,3 +6,21 @@ services:
     restart: always
     ports:
       - "9092:9092"
+      - "9093:8081"
+      - "9094:9644"
+
+  redpanda-console:
+    image: redpandadata/console
+    hostname: redpanda-console
+    container_name: redpanda-console
+    restart: always
+    network_mode: "host"
+    environment:
+      SERVER_LISTENPORT: "9095"
+      KAFKA_BROKERS: "localhost:9092"
+      KAFKA_SCHEMAREGISTRY_ENABLED: "true"
+      KAFKA_SCHEMAREGISTRY_URLS: "http://localhost:9093"
+      REDPANDA_ADMINAPI_ENABLED: "true"
+      REDPANDA_ADMINAPI_URLS: "http://localhost:9094"
+    depends_on:
+      - redpanda
