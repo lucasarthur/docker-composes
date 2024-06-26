@@ -4,23 +4,27 @@ services:
     hostname: redpanda
     container_name: redpanda
     restart: always
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --kafka-addr PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr PLAINTEXT://redpanda:29092,OUTSIDE://localhost:9092
     ports:
       - "9092:9092"
-      - "9093:8081"
-      - "9094:9644"
 
   redpanda-console:
     image: redpandadata/console
     hostname: redpanda-console
     container_name: redpanda-console
     restart: always
-    network_mode: "host"
     environment:
-      SERVER_LISTENPORT: "9095"
-      KAFKA_BROKERS: "localhost:9092"
+      KAFKA_BROKERS: "redpanda:29092"
       KAFKA_SCHEMAREGISTRY_ENABLED: "true"
-      KAFKA_SCHEMAREGISTRY_URLS: "http://localhost:9093"
+      KAFKA_SCHEMAREGISTRY_URLS: "http://redpanda:8081"
       REDPANDA_ADMINAPI_ENABLED: "true"
-      REDPANDA_ADMINAPI_URLS: "http://localhost:9094"
+      REDPANDA_ADMINAPI_URLS: "http://redpanda:9644"
+    ports:
+      - "9093:8080"
     depends_on:
       - redpanda
